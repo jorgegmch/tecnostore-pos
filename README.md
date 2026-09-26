@@ -1,57 +1,77 @@
 ﻿# TecnoStore POS
 
-Sistema de consola en Java para la gestión de ventas, inventario y clientes de una tienda de celulares.
+Console-based point-of-sale system in Java for managing a phone store's catalog, customers, sales, and credit accounts.
 
-## Descripción del proyecto
+---
 
-TecnoStore POS es un sistema de punto de venta desarrollado en Java que permite gestionar el catálogo de celulares, registrar clientes, procesar ventas y generar reportes. Aplica principios de Programación Orientada a Objetos, patrones de diseño y persistencia con MySQL mediante JDBC.
+## Features
 
-## Estructura de clases
+- Full CRUD for the phone catalog: brand, model, price, stock, OS and price-based tier assignment
+- Customer registration with unique identification enforced at the application and database level
+- Sale registration with automatic tier-based discounts (5% low tier, 10% mid tier, none for high tier)
+- Credit sales: mark a sale as credit at checkout, then register partial payments (abonos) until the balance reaches zero
+- Operational reports: low-stock alerts, top 3 best-selling phones, monthly sales totals, and a plain-text sales report
+- Global management report combining total sales, units sold per model, outstanding customer credits, and current stock into a single file
+- All monetary calculations use `BigDecimal` throughout, avoiding floating-point rounding errors
+
+---
+
+## Tech stack
+
+- Java 17
+- MySQL 8.0 (Aiven Cloud)
+- JDBC — MySQL Connector/J 9.7.0
+- Apache NetBeans 18, Ant build (`build.xml`)
+- Design patterns: Singleton, Factory, Strategy
+
+---
+
+## Setup instructions
+
+1. Clone the repository:
 
 ```
-src/
-└── com/tecnostore/pos/
-    ├── Main.java                         # Menú principal de consola
-    ├── modelo/
-    │   ├── Producto.java                 # Clase abstracta base
-    │   ├── Celular.java                  # Extiende Producto
-    │   ├── Cliente.java                  # Entidad cliente
-    │   ├── Venta.java                    # Entidad venta
-    │   ├── ItemVenta.java                # Detalle de venta
-    │   ├── CategoriaGama.java            # Enum: ALTA, MEDIA, BAJA
-    │   └── SistemaOperativo.java         # Enum: ANDROID, IOS, HARMONYOS
-    ├── persistencia/
-    │   ├── ConexionDB.java               # Singleton con Double-Checked Locking
-    │   ├── ICelularDAO.java              # Interfaz DAO celulares
-    │   ├── IClienteDAO.java              # Interfaz DAO clientes
-    │   ├── IVentaDAO.java                # Interfaz DAO ventas
-    │   ├── CelularDAO.java               # CRUD celulares con JDBC
-    │   ├── ClienteDAO.java               # CRUD clientes con JDBC
-    │   └── VentaDAO.java                 # Transacciones ACID de ventas
-    ├── servicio/
-    │   ├── GestorCelulares.java          # Reglas de negocio celulares
-    │   ├── GestorClientes.java           # Reglas de negocio clientes
-    │   └── GestorVentas.java             # Reglas de negocio ventas
-    ├── patron/
-    │   ├── FactoryCelular.java           # Factory: asigna gama por precio
-    │   ├── EstrategiaDescuento.java      # Interfaz Strategy
-    │   ├── SinDescuento.java             # Estrategia sin descuento
-    │   ├── DescuentoGamaMedia.java       # Descuento 10% gama media
-    │   ├── DescuentoGamaBaja.java        # Descuento 5% gama baja
-    │   └── StrategyDescuento.java        # Contexto Strategy
-    └── util/
-        ├── Validador.java                # Validaciones reutilizables
-        ├── ReporteUtils.java             # Reportes con Stream API
-        └── ArchivoUtils.java             # Generación de reporte_ventas.txt
+git clone https://github.com/jorgegmch/tecnostore-pos.git
+cd tecnostore-pos
 ```
 
-## Patrones de diseño implementados
+2. Create the database by running the schema script against your MySQL instance:
 
-- **Singleton**: `ConexionDB` — instancia única de conexión con Double-Checked Locking
-- **Factory**: `FactoryCelular` — crea celulares y asigna gama automáticamente según precio
-- **Strategy**: `StrategyDescuento` — aplica descuentos según gama del celular
+```
+scripts/tecnostore_db_schema.sql
+```
 
-## Ejemplo de ejecución
+The `DROP DATABASE` line at the top is commented out by default — uncomment it only if you want to reset an existing database.
+
+3. Copy the config template and fill in your own credentials:
+
+```
+cp src/config.properties.example src/config.properties
+```
+
+Then edit `src/config.properties`:
+
+```properties
+db.url=jdbc:mysql://HOST:PUERTO/tecnostore_db?ssl-mode=REQUIRED
+db.user=USUARIO
+db.password=CONTRASENA
+```
+
+`config.properties` is never committed to the repository (see `.gitignore`).
+
+4. Run it — either from NetBeans (open the project, right-click `Main.java`, **Run File**), or from a terminal:
+
+```
+ant run
+```
+
+Both do exactly the same thing: NetBeans's Run button executes the `run` target defined in `build.xml`.
+
+---
+
+## Usage
+
+![Console output](docs/console-run.png)
 
 ```
 Bienvenido a TecnoStore POS
@@ -60,7 +80,9 @@ Bienvenido a TecnoStore POS
 1. Gestion de Celulares
 2. Gestion de Clientes
 3. Registrar Venta
-4. Reportes
+4. Reportes operativos
+5. Reporte global de gestion
+6. Registrar abono
 0. Salir
 Seleccione una opcion: 1
 
@@ -74,33 +96,99 @@ Marca: Samsung
 Modelo: Galaxy S24
 Precio: 3500000
 Stock: 10
-Sistema operativo (ANDROID/IOS/HARMONYOS): android
-Celular registrado con ID: 1 | Gama asignada: ALTA
+Sistema operativo (ANDROID/IOS/HARMONYOS): Android
+Celular registrado con ID: 3 | Gama asignada: ALTA
 ```
 
-## Indicaciones para conexión MySQL
+- **Reportes operativos (4)**: stock bajo, top 3 más vendidos, ventas por mes, o generar `reporte_ventas.txt`.
+- **Reporte global de gestion (5)**: genera `reporte_global.txt` con ventas totales, unidades por modelo, créditos pendientes y stock actual — no requiere ningún dato de entrada.
+- **Registrar abono (6)**: pide el ID de la venta a crédito y el monto a abonar; rechaza montos mayores al saldo pendiente.
 
-1. Crear el archivo `src/config.properties` (no incluido en el repositorio por seguridad):
+---
 
-```properties
-db.url=jdbc:mysql://HOST:PUERTO/tecnostore_db?ssl-mode=REQUIRED
-db.user=USUARIO
-db.password=CONTRASENA
+## Project structure
+
+```
+tecnostore-pos/
+├── docs/
+│   └── console-run.png
+├── scripts/
+│   └── tecnostore_db_schema.sql
+├── src/
+│   ├── config.properties.example
+│   └── com/tecnostore/pos/
+│       ├── Main.java
+│       ├── modelo/
+│       │   ├── Producto.java              # Abstract base class
+│       │   ├── Celular.java               # Extends Producto
+│       │   ├── Cliente.java
+│       │   ├── Venta.java
+│       │   ├── ItemVenta.java
+│       │   ├── Credito.java
+│       │   ├── CategoriaGama.java         # Enum: ALTA, MEDIA, BAJA
+│       │   └── SistemaOperativo.java      # Enum: ANDROID, IOS, HARMONYOS
+│       ├── persistencia/
+│       │   ├── ConexionDB.java            # Singleton, double-checked locking
+│       │   ├── ICelularDAO.java / CelularDAO.java
+│       │   ├── IClienteDAO.java / ClienteDAO.java
+│       │   ├── IVentaDAO.java / VentaDAO.java   # ACID transaction on sale
+│       │   ├── ICreditoDAO.java / CreditoDAO.java
+│       │   └── IReporteDAO.java / ReporteDAO.java
+│       ├── servicio/
+│       │   ├── GestorCelulares.java
+│       │   ├── GestorClientes.java
+│       │   ├── GestorVentas.java
+│       │   ├── GestorCreditos.java
+│       │   └── ReporteService.java        # Singleton
+│       ├── patron/
+│       │   ├── FactoryCelular.java        # Factory: assigns tier by price
+│       │   ├── EstrategiaDescuento.java   # Strategy interface
+│       │   ├── SinDescuento.java
+│       │   ├── DescuentoGamaMedia.java
+│       │   ├── DescuentoGamaBaja.java
+│       │   └── StrategyDescuento.java     # Strategy context
+│       └── util/
+│           ├── Validador.java
+│           ├── ReporteUtils.java
+│           └── ArchivoUtils.java
+├── libs/
+│   └── mysql-connector-j-9.7.0.jar
+└── build.xml
 ```
 
-2. Ejecutar el script `tecnostore_db.sql` en tu servidor MySQL para crear las tablas.
+---
 
-3. El driver MySQL Connector/J 9.7.0 está incluido en `libs/`.
+## Database design
 
-## Tecnologías utilizadas
+| Table | Description |
+|---|---|
+| `celulares` | Phone catalog: brand, model, OS, price tier, price, stock |
+| `clientes` | Customers, unique by `identificacion`; `correo` and `telefono` are nullable and not unique |
+| `ventas` | Sales: customer, date, total |
+| `detalle_ventas` | Line items per sale: phone, quantity, subtotal |
+| `creditos` | One outstanding balance per credit sale (`UNIQUE` on `id_venta`) |
 
-- Java 17
-- MySQL 8.0 (Aiven Cloud)
-- JDBC — MySQL Connector/J 9.7.0
-- Apache NetBeans 18
-- Git / GitHub
+### Design decisions
 
-## Autor(es)
+- **`CHECK` constraints** enforce `precio > 0`, `stock >= 0` and `cantidad > 0` at the database level, as a safety net independent of the application layer.
+- **`correo` and `telefono` are nullable with no `UNIQUE` constraint**, since several customers may legitimately share one (e.g. a family member without their own email or a store account).
+- **A credit is tied 1:1 to a sale** (`UNIQUE(id_venta)`): a sale is either paid in full or has exactly one outstanding balance, never several partial records.
 
-- Jorge Gomez
-- Joel Martinez
+---
+
+## Known limitations
+
+- No automated tests.
+- No authentication — the app assumes a single trusted operator.
+- Sale dates are stored as `DATE`, not `DATETIME`: time-of-day is not tracked.
+- Abonos update the balance directly; there is no ledger of individual payments, only the current `saldo_pendiente`.
+
+---
+
+## License
+
+Copyright (c) 2026 Jorge Gomez, Joel Martinez. All rights reserved.
+
+This repository is published for portfolio review. The code may not be copied, modified or redistributed without permission.
+
+Built by [Jorge Gomez](https://github.com/jorgegmch) and [Joel Martinez](https://github.com/JoelSantiagoMP)

@@ -1,0 +1,5 @@
+﻿# Copia este archivo como config.properties (sin .example) y completa tus datos reales.
+# config.properties NUNCA se sube al repositorio — ver .gitignore.
+db.url=jdbc:mysql://HOST:PUERTO/tecnostore_db?ssl-mode=REQUIRED
+db.user=USUARIO
+db.password=CONTRASENA

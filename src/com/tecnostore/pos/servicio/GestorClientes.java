@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.tecnostore.pos.servicio;
 
 import com.tecnostore.pos.modelo.Cliente;
@@ -34,6 +30,10 @@ public class GestorClientes {
         Cliente existente = clienteDAO.buscarPorId(cliente.getId());
         if (existente == null) {
             throw new IllegalArgumentException("Cliente no encontrado.");
+        }
+        Cliente conMismaIdentificacion = clienteDAO.buscarPorIdentificacion(cliente.getIdentificacion());
+        if (conMismaIdentificacion != null && !conMismaIdentificacion.getId().equals(cliente.getId())) {
+            throw new IllegalArgumentException("Ya existe un cliente con esa identificación.");
         }
         clienteDAO.actualizar(cliente);
     }

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.tecnostore.pos.modelo;
 
 import java.math.BigDecimal;
@@ -52,7 +48,7 @@ public abstract class Producto {
     public BigDecimal getPrecio() { return precio; }
 
     public final void setPrecio(BigDecimal precio) {
-        if (precio == null || precio.compareTo(BigDecimal.ZERO) < 0) {
+        if (precio == null || precio.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("El precio debe ser un valor positivo");
         }
         this.precio = precio;
