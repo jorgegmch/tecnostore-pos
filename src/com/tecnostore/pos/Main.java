@@ -125,11 +125,13 @@ public class Main {
             return;
         }
         System.out.print("Nuevo precio (actual: " + celular.getPrecio() + "): ");
-        celular.setPrecio(new BigDecimal(scanner.nextLine().trim()));
+        BigDecimal nuevoPrecio = new BigDecimal(scanner.nextLine().trim());
+        celular.setPrecio(nuevoPrecio);
+        celular.setCategoriaGama(FactoryCelular.determinarGama(nuevoPrecio));
         System.out.print("Nuevo stock (actual: " + celular.getStock() + "): ");
         celular.setStock(Integer.parseInt(scanner.nextLine().trim()));
         gestorCelulares.actualizar(celular);
-        System.out.println("Celular actualizado correctamente.");
+        System.out.println("Celular actualizado correctamente. Gama: " + celular.getCategoriaGama());
     }
 
     private static void eliminarCelular() throws Exception {

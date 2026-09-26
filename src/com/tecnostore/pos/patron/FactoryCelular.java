@@ -12,14 +12,21 @@ public class FactoryCelular {
 
     public static Celular crear(String marca, String modelo, BigDecimal precio,
                                 int stock, SistemaOperativo so) {
-        CategoriaGama gama;
-        if (precio.compareTo(PRECIO_GAMA_ALTA) >= 0) {
-            gama = CategoriaGama.ALTA;
-        } else if (precio.compareTo(PRECIO_GAMA_MEDIA) >= 0) {
-            gama = CategoriaGama.MEDIA;
-        } else {
-            gama = CategoriaGama.BAJA;
-        }
+        CategoriaGama gama = determinarGama(precio);
         return new Celular(null, marca, modelo, precio, stock, so, gama);
+    }
+
+    /**
+     * Determina la gama según el precio. Se usa al crear un celular y al
+     * actualizar su precio, para que gama y precio nunca queden desincronizados.
+     */
+    public static CategoriaGama determinarGama(BigDecimal precio) {
+        if (precio.compareTo(PRECIO_GAMA_ALTA) >= 0) {
+            return CategoriaGama.ALTA;
+        } else if (precio.compareTo(PRECIO_GAMA_MEDIA) >= 0) {
+            return CategoriaGama.MEDIA;
+        } else {
+            return CategoriaGama.BAJA;
+        }
     }
 }
