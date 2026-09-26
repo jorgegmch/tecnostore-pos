@@ -122,5 +122,6 @@ $RECYCLE.BIN/
 config.properties
 src/config.properties
 
-# Reporte generado en cada ejecución de la app, no es código fuente
+# Reportes generados en cada ejecución de la app
 reporte_ventas.txt
+reporte_global.txt
