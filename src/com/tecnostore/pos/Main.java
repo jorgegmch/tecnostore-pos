@@ -8,6 +8,7 @@ import com.tecnostore.pos.patron.SinDescuento;
 import com.tecnostore.pos.patron.StrategyDescuento;
 import com.tecnostore.pos.servicio.GestorCelulares;
 import com.tecnostore.pos.servicio.GestorClientes;
+import com.tecnostore.pos.servicio.GestorCreditos;
 import com.tecnostore.pos.servicio.GestorVentas;
 import com.tecnostore.pos.servicio.ReporteService;
 import com.tecnostore.pos.util.ArchivoUtils;
@@ -25,6 +26,7 @@ public class Main {
     private static final GestorCelulares gestorCelulares = new GestorCelulares();
     private static final GestorClientes gestorClientes = new GestorClientes();
     private static final GestorVentas gestorVentas = new GestorVentas();
+    private static final GestorCreditos gestorCreditos = new GestorCreditos();
 
     public static void main(String[] args) {
         System.out.println("Bienvenido a TecnoStore POS");
@@ -55,6 +57,7 @@ public class Main {
         System.out.println("3. Registrar Venta");
         System.out.println("4. Reportes operativos");
         System.out.println("5. Reporte global de gestion");
+        System.out.println("6. Registrar abono");
         System.out.println("0. Salir");
         System.out.print("Seleccione una opcion: ");
     }
@@ -66,6 +69,7 @@ public class Main {
             case 3: registrarVenta(); break;
             case 4: menuReportes(); break;
             case 5: generarReporteGlobal(); break;
+            case 6: registrarAbono(); break;
             case 0: break;
             default: System.out.println("Opcion no valida.");
         }
@@ -233,7 +237,26 @@ public class Main {
         }
 
         gestorVentas.registrarVenta(venta);
-        System.out.println("Venta registrada. Total: $" + venta.getTotal());
+        System.out.println("Venta registrada con ID: " + venta.getId() + " | Total: $" + venta.getTotal());
+
+        System.out.print("Venta de contado o a credito? (c/k): ");
+        String tipoVenta = scanner.nextLine().trim().toLowerCase();
+        if (tipoVenta.equals("k")) {
+            gestorCreditos.registrarCredito(venta);
+            System.out.println("Credito registrado. Saldo pendiente: $" + venta.getTotal());
+        }
+    }
+
+    private static void registrarAbono() throws Exception {
+        System.out.print("ID de la venta a abonar: ");
+        Long idVenta = Long.parseLong(scanner.nextLine().trim());
+        Credito credito = gestorCreditos.buscarPorVenta(idVenta);
+        System.out.println("Cliente: " + credito.getCliente().getNombre()
+                + " | Saldo pendiente: $" + credito.getSaldoPendiente());
+        System.out.print("Monto del abono: ");
+        BigDecimal monto = new BigDecimal(scanner.nextLine().trim());
+        BigDecimal nuevoSaldo = gestorCreditos.registrarAbono(idVenta, monto);
+        System.out.println("Abono registrado. Nuevo saldo pendiente: $" + nuevoSaldo);
     }
 
     // REPORTES
