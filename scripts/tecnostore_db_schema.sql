@@ -1,5 +1,4 @@
--- Descomentar solo si se quiere recrear la base desde cero (borra todo)
--- DROP DATABASE IF EXISTS tecnostore_db;
+DROP DATABASE IF EXISTS tecnostore_db;
 CREATE DATABASE tecnostore_db;
 
 USE tecnostore_db;
@@ -23,13 +22,12 @@ CREATE TABLE clientes (
     id              INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nombre          VARCHAR(100) NOT NULL,
     identificacion  VARCHAR(20)  NOT NULL,
-    correo          VARCHAR(100) NOT NULL,
-    telefono        VARCHAR(20)  NOT NULL
+    correo          VARCHAR(100) NULL,
+    telefono        VARCHAR(20)  NULL
 );
 
 ALTER TABLE clientes ADD UNIQUE clientes_identificacion_unique (identificacion);
-ALTER TABLE clientes ADD UNIQUE clientes_correo_unique (correo);
--- Sin UNIQUE en telefono: dos clientes pueden compartir número
+-- Sin UNIQUE en correo ni telefono: varios clientes pueden compartir uno (ej. familiares sin correo propio)
 
 
 CREATE TABLE ventas (
