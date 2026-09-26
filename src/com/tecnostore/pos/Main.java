@@ -9,8 +9,10 @@ import com.tecnostore.pos.patron.StrategyDescuento;
 import com.tecnostore.pos.servicio.GestorCelulares;
 import com.tecnostore.pos.servicio.GestorClientes;
 import com.tecnostore.pos.servicio.GestorVentas;
+import com.tecnostore.pos.servicio.ReporteService;
 import com.tecnostore.pos.util.ArchivoUtils;
 import com.tecnostore.pos.util.ReporteUtils;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
@@ -51,7 +53,8 @@ public class Main {
         System.out.println("1. Gestion de Celulares");
         System.out.println("2. Gestion de Clientes");
         System.out.println("3. Registrar Venta");
-        System.out.println("4. Reportes");
+        System.out.println("4. Reportes operativos");
+        System.out.println("5. Reporte global de gestion");
         System.out.println("0. Salir");
         System.out.print("Seleccione una opcion: ");
     }
@@ -62,6 +65,7 @@ public class Main {
             case 2: menuClientes(); break;
             case 3: registrarVenta(); break;
             case 4: menuReportes(); break;
+            case 5: generarReporteGlobal(); break;
             case 0: break;
             default: System.out.println("Opcion no valida.");
         }
@@ -284,6 +288,16 @@ public class Main {
                 break;
             default:
                 System.out.println("Opcion no valida.");
+        }
+    }
+
+    private static void generarReporteGlobal() {
+        try {
+            ReporteService.getInstancia().generarReporteGlobal();
+        } catch (SQLException e) {
+            System.out.println("Error de base de datos al generar el reporte: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Error al escribir el archivo del reporte: " + e.getMessage());
         }
     }
 }
