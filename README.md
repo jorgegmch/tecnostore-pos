@@ -100,9 +100,9 @@ Sistema operativo (ANDROID/IOS/HARMONYOS): Android
 Celular registrado con ID: 3 | Gama asignada: ALTA
 ```
 
-- **Reportes operativos (4)**: stock bajo, top 3 más vendidos, ventas por mes, o generar `reporte_ventas.txt`.
-- **Reporte global de gestion (5)**: genera `reporte_global.txt` con ventas totales, unidades por modelo, créditos pendientes y stock actual — no requiere ningún dato de entrada.
-- **Registrar abono (6)**: pide el ID de la venta a crédito y el monto a abonar; rechaza montos mayores al saldo pendiente.
+- **Reportes operativos (4)**: low-stock alerts, top 3 best sellers, monthly sales totals, or generate `reporte_ventas.txt`.
+- **Reporte global de gestion (5)**: generates `reporte_global.txt` with total sales, units sold per model, outstanding credits, and current stock — requires no input.
+- **Registrar abono (6)**: asks for the sale ID and the amount to pay; rejects amounts greater than the outstanding balance.
 
 ---
 
